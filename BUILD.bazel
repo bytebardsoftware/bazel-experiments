@@ -1,0 +1,17 @@
+load("@gazelle//:def.bzl", "gazelle")
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+
+gazelle(name = "gazelle")
+
+go_library(
+    name = "bazel-experiments_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/bytebard.software/bazel-experiments",
+    visibility = ["//visibility:private"],
+)
+
+go_binary(
+    name = "bazel-experiments",
+    embed = [":bazel-experiments_lib"],
+    visibility = ["//visibility:public"],
+)
