@@ -58,7 +58,7 @@ func main() {
 
 func createRuntime(ctx context.Context) wazero.Runtime {
 	// Create a new WebAssembly Runtime.
-	runtime := wazero.NewRuntime(ctx)
+	runtime := wazero.NewRuntimeWithConfig(ctx, wazero.NewRuntimeConfigCompiler())
 
 	// Instantiate WASI, which implements host functions needed for TinyGo to
 	// implement `panic`.
@@ -68,9 +68,7 @@ func createRuntime(ctx context.Context) wazero.Runtime {
 }
 
 func createWasmMod(ctx context.Context, runtime wazero.Runtime) (api.Module, error) {
-	// Instantiate the guest Wasm into the same runtime. It exports the `add`
-	// function, implemented in WebAssembly.
-	// log.Printf("BL: Plguin src is %s", wasm_plugin.PluginSrc)
+	// Will call runtime.CompileModule() and runtime.InstantiateModule()
 	return runtime.InstantiateWithConfig(ctx, wasm_plugin.PluginSrc, wazero.NewModuleConfig().WithStartFunctions("_initialize"))
 }
 
