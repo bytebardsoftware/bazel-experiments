@@ -1,0 +1,16 @@
+load("@rules_go//go:def.bzl", "go_library")
+load("//:wasm.bzl", "compile_to_wasm")
+
+compile_to_wasm(
+    name = "wasm",
+    src = "plugin_src.go",
+    out = "plugin.wasm",
+    visibility = ["//visibility:public"],
+)
+
+go_library(
+    name = "wasm_lib",
+    srcs = ["plugin_src.go"],
+    importpath = "github.com/bytebard.software/bazel-experiments/plugin/wasm",
+    visibility = ["//visibility:private"],
+)

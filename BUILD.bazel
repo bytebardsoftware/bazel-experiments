@@ -6,10 +6,13 @@ gazelle(name = "gazelle")
 go_library(
     name = "bazel-experiments_lib",
     srcs = ["main.go"],
-    embedsrcs = ["add.wasm"],
+    embedsrcs = [
+        "//plugin/wasm:wasm",  #keep
+    ],
     importpath = "github.com/bytebard.software/bazel-experiments",
     visibility = ["//visibility:private"],
     deps = [
+        "//plugin:plugin",  #keep
         "@com_github_tetratelabs_wazero//:wazero",
         "@com_github_tetratelabs_wazero//api",
         "@com_github_tetratelabs_wazero//imports/wasi_snapshot_preview1",
@@ -18,7 +21,6 @@ go_library(
 
 go_binary(
     name = "bazel-experiments",
-    data = ["//:add.wasm"],
     embed = [":bazel-experiments_lib"],
     visibility = ["//visibility:public"],
 )

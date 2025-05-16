@@ -3,6 +3,9 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "plugin",
     srcs = ["plugin.go"],
+    embedsrcs = [
+        "//plugin/wasm:wasm",  #keep
+    ],
     importpath = "github.com/bytebard.software/bazel-experiments/plugin",
     visibility = ["//visibility:public"],
 )
