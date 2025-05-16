@@ -1,17 +1,30 @@
 load("@gazelle//:def.bzl", "gazelle")
-load("@rules_go//go:def.bzl", "go_binary", "go_library")
+load("@rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
 
 gazelle(name = "gazelle")
 
 go_library(
     name = "bazel-experiments_lib",
     srcs = ["main.go"],
+    embedsrcs = ["add.wasm"],
     importpath = "github.com/bytebard.software/bazel-experiments",
     visibility = ["//visibility:private"],
+    deps = [
+        "@com_github_tetratelabs_wazero//:wazero",
+        "@com_github_tetratelabs_wazero//api",
+        "@com_github_tetratelabs_wazero//imports/wasi_snapshot_preview1",
+    ],
 )
 
 go_binary(
     name = "bazel-experiments",
+    data = ["//:add.wasm"],
     embed = [":bazel-experiments_lib"],
     visibility = ["//visibility:public"],
+)
+
+go_test(
+    name = "bazel-experiments_test",
+    srcs = ["main_test.go"],
+    embed = [":bazel-experiments_lib"],
 )
