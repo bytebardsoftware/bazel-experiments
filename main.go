@@ -25,7 +25,8 @@ func main() {
 	flag.Parse()
 
 	// Choose the context to use for function calls.
-	ctx := context.Background()
+	// ctx := context.Background()
+	ctx := context.TODO()
 
 	runtime := createRuntime(ctx)
 	defer runtime.Close(ctx)
@@ -35,20 +36,24 @@ func main() {
 		log.Panicf("failed to instantiate module: %v", err)
 	}
 
-	// Read two args to add.
-	op, x, y, err := readOpAndTwoArgs(flag.Arg(0), flag.Arg(1), flag.Arg(2))
-	if err != nil {
-		log.Panicf("failed to read arguments: %v", err)
-	}
+	fun := mod.ExportedFunction("iterations_squared")
+	fmt.Printf("BL: iterations START")
+	fun.Call(ctx, 50_000)
+	fmt.Printf("BL: iterations DONE")
 
-	// Call the `add` function and print the results to the console.
-	fun := mod.ExportedFunction(op)
-	results, err := wasmRun(ctx, fun, x, y)
-	if err != nil {
-		log.Panicf("failed to call add: %v", err)
-	}
+	// // Read two args to add.
+	// op, x, y, err := readOpAndTwoArgs(flag.Arg(0), flag.Arg(1), flag.Arg(2))
+	// if err != nil {
+	// 	log.Panicf("failed to read arguments: %v", err)
+	// }
 
-	fmt.Printf("%d %s %d = %d\n", x, op, y, results[0])
+	// fun := mod.ExportedFunction(op)
+	// results, err := wasmRun(ctx, fun, x, y)
+	// if err != nil {
+	// 	log.Panicf("failed to call add: %v", err)
+	// }
+	//
+	// fmt.Printf("%d %s %d = %d\n", x, op, y, results[0])
 }
 
 func createRuntime(ctx context.Context) wazero.Runtime {
