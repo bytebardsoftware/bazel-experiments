@@ -12,13 +12,13 @@ func sub(x, y uint32) uint32 {
 	return x - y
 }
 
-//go:wasmexport iterations_squared
-func iterations_squared(iterations uint32) uint32 {
+//go:wasmexport inner_loop_iterations
+func inner_loop_iterations(outer uint32, inner uint32) uint32 {
 	var res uint32 = 0
 	var i uint32 = 0
-	for i < iterations {
+	for i < outer {
 		var u uint32 = 0
-		for u < iterations {
+		for u < inner {
 			res = (u % 1000) + (i % 1000)
 			u += 1
 		}

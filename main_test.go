@@ -32,15 +32,30 @@ func BenchmarkSimpleFunctionCallWasm(b *testing.B) {
 	}
 	add := mod.ExportedFunction("add")
 
+	// Declare variable outside the loop to avoid optimizations
+	var i uint64 = 0
 	for b.Loop() {
-		_, err = wasmRun(ctx, add, 1000, 1000)
-		if err != nil {
-			panic(err)
-		}
+		res, _ := wasmRun(ctx, add, i, 1)
+		// Ignore error
+		i = res[0]
 	}
 }
 
-var expensiveIterations uint32 = 1_000
+func add(left uint64, right uint64) uint64 {
+	var res = left + right
+	return res
+}
+
+func BenchmarkSimpleFunctionCallGo(b *testing.B) {
+	// Declare variable outside the loop to avoid optimizations
+	var i uint64 = 0
+	for b.Loop() {
+		i = add(i, 1)
+	}
+}
+
+var iterationsInner uint32 = 1000
+var iterationsOuter uint32 = 1000
 
 func BenchmarkExpensiveFunctionCallWasm(b *testing.B) {
 	ctx := context.Background()
@@ -50,22 +65,25 @@ func BenchmarkExpensiveFunctionCallWasm(b *testing.B) {
 	if err != nil {
 		panic(err)
 	}
-	wait := mod.ExportedFunction("iterations_squared")
+	iterations := mod.ExportedFunction("inner_loop_iterations")
+
+	inner := uint64(iterationsInner)
+	outer := uint64(iterationsOuter)
 
 	for b.Loop() {
-		_, err = wasmRun(ctx, wait, uint64(expensiveIterations))
+		_, err = wasmRun(ctx, iterations, outer, inner)
 		if err != nil {
 			panic(err)
 		}
 	}
 }
 
-func expensive(iterations uint32) uint32 {
+func inner_loop_iterations(outer uint32, inner uint32) uint32 {
 	var res uint32 = 0
 	var i uint32 = 0
-	for i < iterations {
+	for i < outer {
 		var u uint32 = 0
-		for u < iterations {
+		for u < inner {
 			res = (u % 1000) + (i % 1000)
 			u += 1
 		}
@@ -76,6 +94,6 @@ func expensive(iterations uint32) uint32 {
 
 func BenchmarkExpensiveFunctionCallGo(b *testing.B) {
 	for b.Loop() {
-		expensive(expensiveIterations)
+		inner_loop_iterations(iterationsOuter, iterationsInner)
 	}
 }
