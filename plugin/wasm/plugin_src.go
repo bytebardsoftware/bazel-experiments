@@ -30,3 +30,4 @@ func inner_loop_iterations(outer uint32, inner uint32) uint32 {
 // main is required for the `wasi` target, even if it isn't used.
 // See https://wazero.io/languages/tinygo/#why-do-i-have-to-define-main
 func main() {}
+

@@ -1,4 +1,4 @@
-def compile_to_wasm(name, src, out, **kwargs):
+def compile_to_wasm(name, srcs, out, **kwargs):
     """
     Compile one source file to wasm using tinygo.
     It requires tinygo to be installed: https://tinygo.org/getting-started/install/,
@@ -6,8 +6,8 @@ def compile_to_wasm(name, src, out, **kwargs):
     """
     native.genrule(
         name = name,
-        srcs = [src],
+        srcs = srcs,
         outs = [out],
-        cmd = "HOME='/Users/blorente' /opt/homebrew/bin/tinygo build -buildmode=c-shared -target=wasip1 -o $@ $<",
+        cmd = "HOME='/Users/blorente' /opt/homebrew/bin/tinygo build -buildmode=c-shared -target=wasip1 -o $@ $(SRCS)",
         **kwargs
     )

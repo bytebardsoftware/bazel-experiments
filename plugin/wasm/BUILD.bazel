@@ -1,16 +1,45 @@
-load("@rules_go//go:def.bzl", "go_library")
+load("@rules_go//go:def.bzl", "go_library", "go_binary")
 load("//:wasm.bzl", "compile_to_wasm")
 
 compile_to_wasm(
     name = "wasm",
-    src = "plugin_src.go",
+    srcs = [
+        "plugin_src.go",
+        "language.go",
+    ],
     out = "plugin.wasm",
     visibility = ["//visibility:public"],
 )
 
 go_library(
     name = "wasm_lib",
-    srcs = ["plugin_src.go"],
+    srcs = [
+        "language.go",
+        "plugin_src.go",
+    ],
     importpath = "github.com/bytebard.software/bazel-experiments/plugin/wasm",
     visibility = ["//visibility:private"],
+    deps = [
+        "@gazelle//config",
+        "@gazelle//label",
+        "@gazelle//repo",
+        "@gazelle//resolve",
+        "@gazelle//rule",
+        "@gazelle//language",
+    ],
+)
+
+go_binary(
+    name = "wasm_bin",
+    goos = "js",
+    goarch = "wasm",
+    embed = [":wasm_lib"],
+)
+
+genrule(
+    name = "language_wasm",
+    srcs = [":wasm_bin"],
+    outs = ["language.wasm"],
+    cmd = "mv $< $@",
+    visibility = ["//visibility:public"],
 )
