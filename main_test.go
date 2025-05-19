@@ -54,8 +54,8 @@ func BenchmarkSimpleFunctionCallGo(b *testing.B) {
 	}
 }
 
-var iterationsInner uint32 = 1000
-var iterationsOuter uint32 = 1000
+var iterationsInner uint32 = 10_000
+var iterationsOuter uint32 = 10_000
 
 func BenchmarkExpensiveFunctionCallWasm(b *testing.B) {
 	ctx := context.Background()
