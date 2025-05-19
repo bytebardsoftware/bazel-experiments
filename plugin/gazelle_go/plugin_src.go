@@ -7,6 +7,7 @@ import (
 	"github.com/bazelbuild/bazel-gazelle/config"
 	"github.com/bazelbuild/bazel-gazelle/label"
 	"github.com/bazelbuild/bazel-gazelle/language"
+	gazellego "github.com/bazelbuild/bazel-gazelle/language/go"
 	"github.com/bazelbuild/bazel-gazelle/repo"
 	"github.com/bazelbuild/bazel-gazelle/resolve"
 	"github.com/bazelbuild/bazel-gazelle/rule"
@@ -45,16 +46,18 @@ func main() {
 
 const trivialName = "trivial"
 
-type trivialLang struct{}
+type trivialLang struct{
+	delegate language.Language
+}
 
 // CheckFlags implements language.Language.
 func (p *trivialLang) CheckFlags(fs *flag.FlagSet, c *config.Config) error {
-	panic("unimplemented")
+	return p.delegate.CheckFlags(fs, c)
 }
 
 // Configure implements language.Language.
 func (p *trivialLang) Configure(c *config.Config, rel string, f *rule.File) {
-	panic("unimplemented")
+	p.delegate.Configure(c, rel, f)
 }
 
 // Embeds implements language.Language.
@@ -105,5 +108,7 @@ func (p *trivialLang) Resolve(c *config.Config, ix *resolve.RuleIndex, rc *repo.
 func (*trivialLang) Name() string { return trivialName }
 
 func NewLanguage() language.Language {
-	return &trivialLang{}
+	return &trivialLang{
+		delegate: gazellego.NewLanguage(),
+	}
 }

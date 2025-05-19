@@ -42,7 +42,7 @@ func main() {
 	fun := mod.ExportedFunction(op)
 	results, err := wasmRun(ctx, fun, x, y)
 	if err != nil {
-		log.Panicf("failed to call add: %v", err)
+		log.Panicf("failed to call %s: %v", op, err)
 	}
 
 	fmt.Printf("%d %s %d = %d\n", x, op, y, results[0])
@@ -60,7 +60,11 @@ func createRuntime(ctx context.Context) wazero.Runtime {
 }
 
 func createWasmMod(ctx context.Context, runtime wazero.Runtime) (api.Module, error) {
-	return runtime.InstantiateWithConfig(ctx, wasm_plugin.LanguageSrc, wazero.NewModuleConfig().WithStartFunctions("_initialize"))
+	module, err := runtime.CompileModule(ctx, wasm_plugin.LanguageSrc)
+	if err != nil {
+		return nil, err
+	}
+	return runtime.InstantiateModule(ctx, module, wazero.NewModuleConfig().WithStartFunctions("_initialize"))
 }
 
 func wasmRun(ctx context.Context, fun api.Function, args ...uint64) ([]uint64, error) {

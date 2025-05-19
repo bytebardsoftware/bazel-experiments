@@ -8,6 +8,6 @@ def compile_to_wasm(name, srcs, out, **kwargs):
         name = name,
         srcs = srcs,
         outs = [out],
-        cmd = "HOME='/Users/blorente' /opt/homebrew/bin/tinygo build -buildmode=c-shared -target=wasip1 -o $@ $(SRCS)",
+        cmd = "HOME='/Users/blorente'  /opt/homebrew/bin/tinygo build -buildmode=c-shared -target=wasip1 -o $@ $(SRCS)",
         **kwargs
     )
