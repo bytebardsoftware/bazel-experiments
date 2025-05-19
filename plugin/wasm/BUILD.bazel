@@ -1,11 +1,11 @@
-load("@rules_go//go:def.bzl", "go_library", "go_binary")
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
 load("//:wasm.bzl", "compile_to_wasm")
 
 compile_to_wasm(
     name = "wasm",
     srcs = [
-        "plugin_src.go",
         "language.go",
+        "plugin_src.go",
     ],
     out = "plugin.wasm",
     visibility = ["//visibility:public"],
@@ -22,18 +22,18 @@ go_library(
     deps = [
         "@gazelle//config",
         "@gazelle//label",
+        "@gazelle//language",
         "@gazelle//repo",
         "@gazelle//resolve",
         "@gazelle//rule",
-        "@gazelle//language",
     ],
 )
 
 go_binary(
     name = "wasm_bin",
-    goos = "js",
-    goarch = "wasm",
     embed = [":wasm_lib"],
+    goarch = "wasm",
+    goos = "wasip1",
 )
 
 genrule(

@@ -4,7 +4,7 @@ import (
 	_ "embed"
 )
 
-//go:embed wasm/plugin.wasm
+// //go:embed wasm/plugin.wasm
 // var PluginSrc []byte
 
 //go:embed wasm/language.wasm
