@@ -4,8 +4,6 @@ go_library(
     name = "plugin",
     srcs = ["plugin.go"],
     embedsrcs = [
-        # "//plugin/wasm:wasm",  #keep
-        # "//plugin/wasm:language_wasm",  #keep
         "//plugin/gazelle_go:language_wasm",  #keep
     ],
     importpath = "github.com/bytebard.software/bazel-experiments/plugin",
