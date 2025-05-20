@@ -1,6 +1,4 @@
-//go:build wasip1 && !tinygo.wasm
-
-// This file is designed to be imported by plugins.
+// This file is designed to be imported by plugins. It should only be used with GOOS="wasip1"
 
 package main
 
@@ -51,4 +49,8 @@ func ByteToPtr(buf []byte) (uint32, uint32) {
 	ptr := &buf[0]
 	unsafePtr := uintptr(unsafe.Pointer(ptr))
 	return uint32(unsafePtr), uint32(len(buf))
+}
+
+func AddrAndSizeToFatPtr(addr uint32, size uint32) uint64 {
+	return (uint64(addr)<<uint64(32) | uint64(size))
 }

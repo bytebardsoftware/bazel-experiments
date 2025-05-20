@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"unsafe"
 
 	"github.com/bazelbuild/bazel-gazelle/language"
 	gazellego "github.com/bazelbuild/bazel-gazelle/language/go"
@@ -46,10 +45,10 @@ type trivialLang struct {
 }
 
 var delegate = gazellego.NewLanguage()
-var delegateName string = delegate.Name()
+var delegateName []byte = []byte(delegate.Name())
 
 //go:wasmexport Name
-func Name() unsafe.Pointer { return unsafe.Pointer(&delegateName) }
+func Name() uint64 { return AddrAndSizeToFatPtr(ByteToPtr(delegateName)) }
 
 // //go:wasmexport CheckFlags
 // func (p *trivialLang) CheckFlags(fs *flag.FlagSet, c *config.Config) error {

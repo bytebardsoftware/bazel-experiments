@@ -102,11 +102,12 @@ func BenchmarkExpensiveFunctionCallGo(b *testing.B) {
 	}
 }
 
-
 func TestHostLang(t *testing.T) {
-	language := host.NewLanguage()
-	name := language.Name()
-	expected := "Test"
+	langHost := host.NewHost()
+	defer langHost.Close()
+
+	name := langHost.Name()
+	expected := "go"
 	if name != expected {
 		t.Errorf("Language name was %s, expected %s", name, expected)
 	}
