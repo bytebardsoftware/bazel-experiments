@@ -10,9 +10,7 @@ import (
 	"strconv"
 
 	wasm_plugin "github.com/bytebard.software/bazel-experiments/plugin"
-	"github.com/tetratelabs/wazero"
-	"github.com/tetratelabs/wazero/api"
-	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
+	"github.com/bytebard.software/bazel-experiments/wazero_wrapper"
 )
 
 // main is an example of how to extend a Go application with an addition
@@ -26,10 +24,10 @@ func main() {
 
 	ctx := context.Background()
 
-	runtime := createRuntime(ctx)
+	runtime := wazero_wrapper.CreateRuntime(ctx)
 	defer runtime.Close(ctx)
 
-	mod, err := createWasmMod(ctx, runtime)
+	mod, err := wazero_wrapper.CreateWasmMod(ctx, runtime, wasm_plugin.LanguageSrc)
 	if err != nil {
 		log.Panicf("failed to instantiate module: %v", err)
 	}
@@ -40,35 +38,12 @@ func main() {
 	}
 
 	fun := mod.ExportedFunction(op)
-	results, err := wasmRun(ctx, fun, x, y)
+	results, err := wazero_wrapper.WasmRun(ctx, fun, x, y)
 	if err != nil {
 		log.Panicf("failed to call %s: %v", op, err)
 	}
 
 	fmt.Printf("%d %s %d = %d\n", x, op, y, results[0])
-}
-
-func createRuntime(ctx context.Context) wazero.Runtime {
-	// Create a new WebAssembly Runtime.
-	runtime := wazero.NewRuntimeWithConfig(ctx, wazero.NewRuntimeConfigCompiler())
-
-	// Instantiate WASI, which implements host functions needed for TinyGo to
-	// implement `panic`.
-	wasi_snapshot_preview1.MustInstantiate(ctx, runtime)
-
-	return runtime
-}
-
-func createWasmMod(ctx context.Context, runtime wazero.Runtime) (api.Module, error) {
-	module, err := runtime.CompileModule(ctx, wasm_plugin.LanguageSrc)
-	if err != nil {
-		return nil, err
-	}
-	return runtime.InstantiateModule(ctx, module, wazero.NewModuleConfig().WithStartFunctions("_initialize"))
-}
-
-func wasmRun(ctx context.Context, fun api.Function, args ...uint64) ([]uint64, error) {
-	return fun.Call(ctx, args...)
 }
 
 func readOpAndTwoArgs(op, xs, ys string) (string, uint64, uint64, error) {

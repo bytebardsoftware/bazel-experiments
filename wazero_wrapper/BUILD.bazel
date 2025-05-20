@@ -1,0 +1,25 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "wazero",
+    srcs = ["wazero.go"],
+    importpath = "github.com/bytebard.software/bazel-experiments/wazero",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_tetratelabs_wazero//:wazero",
+        "@com_github_tetratelabs_wazero//api",
+        "@com_github_tetratelabs_wazero//imports/wasi_snapshot_preview1",
+    ],
+)
+
+go_library(
+    name = "wazero_wrapper",
+    srcs = ["wazero.go"],
+    importpath = "github.com/bytebard.software/bazel-experiments/wazero_wrapper",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_tetratelabs_wazero//:wazero",
+        "@com_github_tetratelabs_wazero//api",
+        "@com_github_tetratelabs_wazero//imports/wasi_snapshot_preview1",
+    ],
+)

@@ -2,28 +2,27 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 
 go_library(
     name = "wasm_lib",
-    srcs = [
-        "plugin_src.go",
-    ],
+    srcs = ["plugin_src.go"],
     importpath = "github.com/bytebard.software/bazel-experiments/plugin/wasm",
     visibility = ["//visibility:private"],
     deps = [
         "@gazelle//config",
         "@gazelle//label",
         "@gazelle//language",
+        "@gazelle//language/go",
         "@gazelle//repo",
         "@gazelle//resolve",
         "@gazelle//rule",
-        "@gazelle//language/go",
     ],
 )
 
 go_binary(
     name = "wasm_bin",
-    embed = [":wasm_lib"],
+    embed = [":gazelle_go_lib"],
     goarch = "wasm",
     goos = "wasip1",
-    linkmode = "c-shared", # Necessary to generate an _initialize function instead of a _start one: https://go.dev/blog/wasmexport#building-a-wasi-reactor
+    linkmode = "c-shared",  # Necessary to generate an _initialize function instead of a _start one: https://go.dev/blog/wasmexport#building-a-wasi-reactor
+    visibility = ["//visibility:public"],
 )
 
 genrule(
@@ -32,4 +31,15 @@ genrule(
     outs = ["language.wasm"],
     cmd = "mv $< $@",
     visibility = ["//visibility:public"],
+)
+
+go_library(
+    name = "gazelle_go_lib",
+    srcs = ["plugin_src.go"],
+    importpath = "github.com/bytebard.software/bazel-experiments/plugin/gazelle_go",
+    visibility = ["//visibility:private"],
+    deps = [
+        "@gazelle//language",
+        "@gazelle//language/go",
+    ],
 )

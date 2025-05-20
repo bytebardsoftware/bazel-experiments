@@ -1,7 +1,5 @@
-load("@gazelle//:def.bzl", "gazelle")
+load("@gazelle//:def.bzl", "DEFAULT_LANGUAGES", "gazelle", "gazelle_binary")
 load("@rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
-
-gazelle(name = "gazelle")
 
 go_library(
     name = "bazel-experiments_lib",
@@ -10,9 +8,7 @@ go_library(
     visibility = ["//visibility:private"],
     deps = [
         "//plugin",  #keep
-        "@com_github_tetratelabs_wazero//:wazero",
-        "@com_github_tetratelabs_wazero//api",
-        "@com_github_tetratelabs_wazero//imports/wasi_snapshot_preview1",
+        "//wazero_wrapper",
     ],
 )
 
@@ -26,4 +22,24 @@ go_test(
     name = "bazel-experiments_test",
     srcs = ["main_test.go"],
     embed = [":bazel-experiments_lib"],
+    deps = [
+        "//host",
+        "//plugin",
+        "//wazero_wrapper",
+    ],
+)
+
+gazelle_binary(
+    name = "my_gazelle_binary",
+    languages = [
+        "//host:host",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+gazelle(name = "gazelle")
+
+gazelle(
+    name = "gazelle_with_wasm",
+    gazelle = ":my_gazelle_binary",
 )

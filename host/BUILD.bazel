@@ -2,7 +2,22 @@ load("@rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "host",
-    srcs = ["host.go"],
+    srcs = [
+        "host.go",
+        "memory.go",
+    ],
     importpath = "github.com/bytebard.software/bazel-experiments/host",
     visibility = ["//visibility:public"],
+    deps = [
+        "//plugin",
+        "//wazero_wrapper",
+        "@com_github_tetratelabs_wazero//:wazero",
+        "@com_github_tetratelabs_wazero//api",
+        "@gazelle//config",
+        "@gazelle//label",
+        "@gazelle//language",
+        "@gazelle//repo",
+        "@gazelle//resolve",
+        "@gazelle//rule",
+    ],
 )
