@@ -112,3 +112,62 @@ func TestHostLang(t *testing.T) {
 		t.Errorf("Language name was %s, expected %s", name, expected)
 	}
 }
+
+func BenchmarkHostLangName(b *testing.B) {
+	langHost := host.NewHost()
+	defer langHost.Close()
+
+	for b.Loop() {
+		_ = langHost.Name()
+	}
+}
+
+func BenchmarkJustCallingLangName(b *testing.B) {
+	ctx := context.Background()
+	runtime := wazero_wrapper.CreateRuntime(ctx)
+	defer runtime.Close(ctx)
+	mod, err := wazero_wrapper.CreateWasmMod(ctx, runtime, wasm_plugin.LanguageSrc)
+	if err != nil {
+		panic(err)
+	}
+	name := mod.ExportedFunction("Name")
+	for b.Loop() {
+		outs, err := wazero_wrapper.WasmRun(ctx, name)
+		if err != nil {
+			panic(err)
+		}
+		ptrAndSize := outs[0]
+		resPtr := uint32(ptrAndSize >> 32)
+		resSize := uint32(ptrAndSize)
+		_, ok := mod.Memory().Read(resPtr, resSize)
+		if !ok {
+			panic("Could not read memory")
+		}
+
+	}
+}
+
+func BenchmarkReadLangNameFromMemory(b *testing.B) {
+	ctx := context.Background()
+	runtime := wazero_wrapper.CreateRuntime(ctx)
+	defer runtime.Close(ctx)
+	mod, err := wazero_wrapper.CreateWasmMod(ctx, runtime, wasm_plugin.LanguageSrc)
+	if err != nil {
+		panic(err)
+	}
+	name := mod.ExportedFunction("Name")
+	outs, err := wazero_wrapper.WasmRun(ctx, name)
+	if err != nil {
+		panic(err)
+	}
+	ptrAndSize := outs[0]
+	resPtr := uint32(ptrAndSize >> 32)
+	resSize := uint32(ptrAndSize)
+
+	for b.Loop() {
+		_, ok := mod.Memory().Read(resPtr, resSize)
+		if !ok {
+			panic("Could not read memory")
+		}
+	}
+}

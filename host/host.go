@@ -20,10 +20,15 @@ import (
 
 const hostName = "host"
 
+type exportedFunctions struct {
+	Name api.Function
+}
+
 type LanguageHost struct {
-	runtime wazero.Runtime
-	module  api.Module
-	ctx     context.Context
+	runtime           wazero.Runtime
+	module            api.Module
+	ctx               context.Context
+	exportedFunctions exportedFunctions
 }
 
 // CheckFlags implements language.Language.
@@ -86,8 +91,7 @@ func (p *LanguageHost) Name() string {
 }
 
 func (p *LanguageHost) callString(funName string) string {
-	fun := p.module.ExportedFunction(funName)
-	outs, err := wazero_wrapper.WasmRun(p.ctx, fun)
+	outs, err := wazero_wrapper.WasmRun(p.ctx, p.exportedFunctions.Name)
 	if err != nil {
 		log.Panicf("Could not run function %s from wasm plugin: %s", funName, err)
 	}
@@ -116,9 +120,14 @@ func NewHost() *LanguageHost {
 	if err != nil {
 		log.Panicf("failed to instantiate module: %v", err)
 	}
+
+	functions := exportedFunctions{
+		Name: mod.ExportedFunction("Name"),
+	}
 	return &LanguageHost{
-		ctx:     ctx,
-		runtime: runtime,
-		module:  mod,
+		ctx:               ctx,
+		runtime:           runtime,
+		module:            mod,
+		exportedFunctions: functions,
 	}
 }

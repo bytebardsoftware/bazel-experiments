@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/bazelbuild/bazel-gazelle/language"
 	gazellego "github.com/bazelbuild/bazel-gazelle/language/go"
 )
@@ -17,7 +15,7 @@ func sub(x, y uint32) uint32 {
 	return x - y
 }
 
-//go:wasmexportg inner_loop_iterations
+//go:wasmexport inner_loop_iterations
 func inner_loop_iterations(outer uint32, inner uint32) uint32 {
 	var res uint32 = 0
 	var i uint32 = 0
@@ -34,9 +32,7 @@ func inner_loop_iterations(outer uint32, inner uint32) uint32 {
 
 // main is required for the `wasi` target, even if it isn't used.
 // See https://wazero.io/languages/tinygo/#why-do-i-have-to-define-main
-func main() {
-	fmt.Println("Hello World")
-}
+func main() {}
 
 const trivialName = "trivial"
 
